@@ -1,4 +1,4 @@
-service: image-upload-service
+service: s3-upload-service
 
 frameworkVersion: '3'
 
@@ -8,7 +8,9 @@ provider:
   region: ap-south-1
   stage: ${opt:stage, 'dev'}
   environment:
-    BUCKET_NAME: ${self:custom.bucketName}
+    QUESTION_BUCKET: ${self:custom.questionBucket}
+    EXAM_BUCKET: ${self:custom.examBucket}
+    BOOKS_BUCKET: ${self:custom.booksBucket}
   iam:
     role:
       statements:
@@ -16,15 +18,15 @@ provider:
           Action:
             - s3:PutObject
             - s3:GetObject
-          Resource: arn:aws:s3:::${self:custom.bucketName}/* 
-        - Effect: Allow
-          Action:
-            - ssm:GetParameter
           Resource: 
-            - arn:aws:ssm:${self:provider.region}:${aws:accountId}:parameter/jwtSecretImageService
-
+            - arn:aws:s3:::${self:custom.questionBucket}/*
+            - arn:aws:s3:::${self:custom.examBucket}/*
+            - arn:aws:s3:::${self:custom.booksBucket}/*
+       
 custom:
-  bucketName: ${self:provider.stage}-uploads
+  questionBucket: ${self:provider.stage}-question-uploads
+  examBucket: ${self:provider.stage}-exam-uploads
+  booksBucket: ${self:provider.stage}-books-uploads
 
 functions:
   generateUploadUrl:
@@ -34,16 +36,17 @@ functions:
           path: /generate-upload-url
           method: post
           cors: true
-          # authorizer:
-          #   name: verifyToken
-          #   type: token
-          #   identitySource: method.request.header.Authorization
+          authorizer:
+            arn: ${cf:shared-clerk-authorizer-production.ClerkAuthorizerArn}
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 300
 resources:
   Resources:
-    UploadBucket:
+    QuestionUploadBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.bucketName}
+        BucketName: ${self:custom.questionBucket}
         CorsConfiguration:
           CorsRules:
             - AllowedHeaders:
@@ -54,3 +57,33 @@ resources:
                 - GET
               AllowedOrigins:
                 - '*'  # Restrict to specific domains in production
+    
+    ExamUploadBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.examBucket}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - PUT
+                - POST
+                - GET
+              AllowedOrigins:
+                - '*'
+    
+    BooksUploadBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.booksBucket}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - PUT
+                - POST
+                - GET
+              AllowedOrigins:
+                - '*'

@@ -1,7 +1,7 @@
 {
-  "name": "image-service",
+  "name": "s3-upload-service",
   "version": "1.0.0",
-  "description": "TypeScript Lambda service for S3 image uploads",
+  "description": "TypeScript Lambda service for S3 uploads",
   "main": "dist/handlers/generateUploadUrl.js",
   "scripts": {
     "build": "tsc",

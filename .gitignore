@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# TypeScript output
+dist/
+.build/
+
+# Serverless directories
+.serverless/
+
+# Environment variables
+.env
+
+# IDE files
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Package locks (optional)
+# package-lock.json

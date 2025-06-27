@@ -1,0 +1,32 @@
+{
+  "name": "image-service",
+  "version": "1.0.0",
+  "description": "TypeScript Lambda service for S3 image uploads",
+  "main": "dist/handlers/generateUploadUrl.js",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "npm run build && serverless deploy --stage production",
+    "deploy:prod": "npm run build && serverless deploy --stage production",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f generateUploadUrl -t",
+    "offline": "serverless offline",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.787.0",
+    "@aws-sdk/client-ssm": "^3.803.0",
+    "@aws-sdk/s3-request-presigner": "^3.787.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.149",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.14.1",
+    "serverless": "^3.40.0",
+    "serverless-plugin-typescript": "^2.1.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

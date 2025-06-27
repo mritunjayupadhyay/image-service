@@ -1,0 +1,56 @@
+service: image-upload-service
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    BUCKET_NAME: ${self:custom.bucketName}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+          Resource: arn:aws:s3:::${self:custom.bucketName}/* 
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource: 
+            - arn:aws:ssm:${self:provider.region}:${aws:accountId}:parameter/jwtSecretImageService
+
+custom:
+  bucketName: ${self:provider.stage}-uploads
+
+functions:
+  generateUploadUrl:
+    handler: dist/handlers/generate-upload-url.handler
+    events:
+      - http:
+          path: /generate-upload-url
+          method: post
+          cors: true
+          # authorizer:
+          #   name: verifyToken
+          #   type: token
+          #   identitySource: method.request.header.Authorization
+resources:
+  Resources:
+    UploadBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - PUT
+                - POST
+                - GET
+              AllowedOrigins:
+                - '*'  # Restrict to specific domains in production

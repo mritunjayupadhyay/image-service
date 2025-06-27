@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "deploy": "npm run build && serverless deploy --stage production",
-    "deploy:prod": "npm run build && serverless deploy --stage production",
+    "deploy:staging": "npm run build && serverless deploy --stage staging",
     "remove": "serverless remove",
     "logs": "serverless logs -f generateUploadUrl -t",
     "offline": "serverless offline",
